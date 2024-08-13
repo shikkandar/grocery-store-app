@@ -14,7 +14,8 @@ import { UpdateCartContext } from "../_context/UpdateCartContext";
 
 const ProductItemDetail = ({ product, setOpen }) => {
   const imageUrl = `${process.env.NEXT_PUBLIC_BAKEND_BASE_URL}${product?.attributes?.images?.data[0]?.attributes?.url}`;
-  const { updateCart, setUpdateCart, cartItemsList } =useContext(UpdateCartContext);
+  const { updateCart, setUpdateCart, cartItemsList } =
+    useContext(UpdateCartContext);
 
   const [productTotalPrice, setProductTotalPrice] = useState(
     product?.attributes?.sellingPrice
@@ -24,8 +25,15 @@ const ProductItemDetail = ({ product, setOpen }) => {
   const [quantity, setQuantity] = useState(1);
   const [loader, setLoader] = useState(false);
 
-  const jwt = localStorage.getItem("jwt");
-  const user = JSON.parse(localStorage.getItem("user"));
+  const [jwt, setJwt] = useState(null);
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setJwt(localStorage.getItem("jwt"));
+      setUser(JSON.parse(localStorage.getItem("user")));
+    }
+  }, []);
+
   const router = useRouter();
 
   const AddToCart = async () => {

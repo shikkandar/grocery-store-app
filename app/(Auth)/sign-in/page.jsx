@@ -20,8 +20,10 @@ const Component = () => {
     setLoader(true);
     signIn(email, password).then(
       (res) => {
-        localStorage.setItem("user", JSON.stringify(res.data.user));
-        localStorage.setItem("jwt", res.data.jwt);
+        if (typeof window !== "undefined") {
+          localStorage.setItem("user", JSON.stringify(res.data.user));
+          localStorage.setItem("jwt", res.data.jwt);
+        }
         toast.success("Login Successfully");
         router.push("/");
         setLoader(false);

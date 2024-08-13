@@ -47,12 +47,14 @@ function Header() {
 
   useEffect(() => {
     getCategoryList();
-    const user = JSON.parse(window.localStorage.getItem("user"));
-    const isLogin = window.localStorage.getItem("jwt") ? true : false;
-    const jwt = window.localStorage.getItem("jwt");
-    setIsLogin(isLogin);
-    setUser(user);
-    setJwt(jwt);
+    if (typeof window !== "undefined") {
+      const user = JSON.parse(window.localStorage.getItem("user"));
+      const isLogin = window.localStorage.getItem("jwt") ? true : false;
+      const jwt = window.localStorage.getItem("jwt");
+      setIsLogin(isLogin);
+      setUser(user);
+      setJwt(jwt);
+    }
   }, []);
 
   useEffect(() => {
@@ -87,7 +89,9 @@ function Header() {
   };
 
   const onSignOut = () => {
-    localStorage.clear();
+    if (typeof window !== "undefined") {
+      localStorage.clear();
+    }
     router.push("/sign-in");
   };
 

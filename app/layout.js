@@ -17,15 +17,17 @@ export default function RootLayout({ children }) {
   const [loading, setLoading] = useState(false);
   const [cartItemsList, setCartItemsList] = useState([]);
   console.log(cartItemsList);
-  
+
   const [user, setUser] = useState(null);
   const [jwt, setJwt] = useState(null);
 
   useEffect(() => {
-    const jwt = window.localStorage.getItem("jwt");
-    const user = JSON.parse(window.localStorage.getItem("user"));
-    setUser(user);
-    setJwt(jwt);
+    if (typeof window !== "undefined") {
+      const jwt = window.localStorage.getItem("jwt");
+      const user = JSON.parse(window.localStorage.getItem("user"));
+      setUser(user);
+      setJwt(jwt);
+    }
   }, []);
 
   useEffect(() => {
@@ -38,7 +40,7 @@ export default function RootLayout({ children }) {
     try {
       setLoading(true);
       const cartItemsList = await getCartItemsApi(user.id, jwt);
-      setUpdateCart(true)
+      setUpdateCart(true);
       setCartItemsList(cartItemsList);
       setLoading(false);
     } catch (error) {

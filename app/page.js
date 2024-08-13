@@ -20,7 +20,9 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    window.localStorage.setItem("redirectPath", window.location.pathname);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("redirectPath", window.location.pathname);
+    }
     const fetchDara = async () => {
       try {
         const [sliders, categories, products] = await Promise.all([

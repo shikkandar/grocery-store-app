@@ -17,8 +17,12 @@ import { styled } from "@mui/material/styles";
 import { AuthUser } from "@/app/_ProtectRoute/AuthUser";
 
 const MyOrder = () => {
-  const jwt = localStorage.getItem("jwt");
-  const user = JSON.parse(localStorage.getItem("user"));
+  const [jwt, setJwt] = useState(null);
+  const [user, setUser] = useState(null);
+  if (typeof window !== "undefined") {
+    setJwt(localStorage.getItem("jwt"));
+    setUser(JSON.parse(localStorage.getItem("user")));
+  }
   const [orderList, setOrderList] = useState();
   const [loading, setLoading] = useState();
 
@@ -79,7 +83,9 @@ const MyOrder = () => {
         ) : (
           <div className="flex flex-col gap-2 mt-5">
             {orderList?.map((order, i) => (
-              <Collapsible key={i} className="w-full">
+              <Collapsible
+                key={i}
+                className="w-full">
                 <CollapsibleTrigger>
                   <div className="border bg-slate-100 flex justify-around p-5 w-[90vw] flex-wrap">
                     <h2>
@@ -87,18 +93,20 @@ const MyOrder = () => {
                       {moment(order?.createdAt).format(`DD/MMM/yyyy`)}
                     </h2>
                     <h2>
-                      <span className="font-bold mr-2">Total Amount:</span> 
+                      <span className="font-bold mr-2">Total Amount:</span>
                       {order?.totalOrderAmount}
                     </h2>
                     <h2>
-                      <span className="font-bold mr-2">Status:</span> 
+                      <span className="font-bold mr-2">Status:</span>
                       {order?.status}
                     </h2>
                   </div>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="flex p-2 flex-col gap-5 justify-center w-[90vw]">
                   <>
-                    <Stepper activeStep={steps.indexOf(order.status)} alternativeLabel>
+                    <Stepper
+                      activeStep={steps.indexOf(order.status)}
+                      alternativeLabel>
                       {steps.map((label) => (
                         <CustomStep key={label}>
                           <CustomStepLabel>{label}</CustomStepLabel>
@@ -106,7 +114,10 @@ const MyOrder = () => {
                       ))}
                     </Stepper>
                     {order?.orderItemList.map((orderItem, index) => (
-                      <MyOrderItem orderItem={orderItem} key={index} />
+                      <MyOrderItem
+                        orderItem={orderItem}
+                        key={index}
+                      />
                     ))}
                   </>
                 </CollapsibleContent>

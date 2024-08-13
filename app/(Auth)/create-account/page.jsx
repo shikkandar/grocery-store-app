@@ -21,8 +21,10 @@ const Component = () => {
     setLoader(true);
     registerUser(username, email, password).then(
       (res) => {
-        localStorage.setItem("user", JSON.stringify(res.data.user));
-        localStorage.setItem("jwt", res.data.jwt);
+        if (typeof window !== "undefined") {
+          localStorage.setItem("user", JSON.stringify(res.data.user));
+          localStorage.setItem("jwt", res.data.jwt);
+        }
         toast.success("Account Created Successfully");
         router.push("/");
         setLoader(false);
@@ -89,11 +91,11 @@ const Component = () => {
   );
 };
 const CreateAccount = () => {
-  return(
+  return (
     <UnAuthUser>
       <Component />
     </UnAuthUser>
-  )
+  );
 };
 
 export default CreateAccount;

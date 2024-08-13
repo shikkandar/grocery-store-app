@@ -1,22 +1,27 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { getCategoryList, getProductByCategory } from "@/app/_utils/GlobalApi";
 import TopCategoryList from "../_component/TopCategoryList";
 import ProductList from "@/app/_components/ProductList";
 import Footer from "@/app/_components/Footer";
 import { LoaderIcon } from "lucide-react";
+import { UpdateCartContext } from "@/app/_context/UpdateCartContext";
 
 const ProductCategory = ({ params }) => {
   const [categoryList, setCategoryList] = useState([]);
   const [productList, setProductList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { updateCart, setUpdateCart } = useContext(UpdateCartContext);
   const categoryName = decodeURIComponent(params.categoryName || "");
 
   useEffect(() => {
-    window.localStorage.setItem("redirectPath", window.location.pathname);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("redirectPath", window.location.pathname);
+    }
   }, []);
-  
+
   useEffect(() => {
+    setUpdateCart(true);
     const fetchData = async () => {
       setLoading(true);
       try {
