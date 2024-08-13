@@ -21,8 +21,8 @@ const Component = () => {
     signIn(email, password).then(
       (res) => {
         if (typeof window !== "undefined") {
-          localStorage.setItem("user", JSON.stringify(res.data.user));
-          localStorage.setItem("jwt", res.data.jwt);
+          window.localStorage.setItem("user", JSON.stringify(res.data.user));
+          window.localStorage.setItem("jwt", res.data.jwt);
         }
         toast.success("Login Successfully");
         router.push("/");
