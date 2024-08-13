@@ -38,15 +38,21 @@ function Header() {
   const [subtotal, setSubtotal] = useState(0);
   const { updateCart } = useContext(UpdateCartContext);
   const [cartItemsList, setCartItemsList] = useState();
-  const user = JSON.parse(localStorage.getItem("user"));
-  const jwt = localStorage.getItem("jwt");
+  const [isLogin, setIsLogin] = useState();
+  const [user, setUser] = useState();
+  const [jwt, setJwt] = useState();
+
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const isLogin = localStorage.getItem("jwt") ? true : false;
-
   useEffect(() => {
     getCategoryList();
+    const user = JSON.parse(window.localStorage.getItem("user"));
+    const isLogin = window.localStorage.getItem("jwt") ? true : false;
+    const jwt = window.localStorage.getItem("jwt");
+    setIsLogin(isLogin);
+    setUser(user);
+    setJwt(jwt);
   }, []);
 
   useEffect(() => {
@@ -172,7 +178,7 @@ function Header() {
                 />
               </SheetDescription>
             </SheetHeader>
-            {cartItemsList?.length >0 && (
+            {cartItemsList?.length > 0 && (
               <SheetClose asChild>
                 <div className="absolute w-[90%] bottom-6 flex flex-col">
                   <h2 className="text-lg font-bold flex justify-between">

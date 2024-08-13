@@ -10,9 +10,12 @@ const ProductCategory = ({ params }) => {
   const [categoryList, setCategoryList] = useState([]);
   const [productList, setProductList] = useState([]);
   const [loading, setLoading] = useState(true);
-  const categoryName = decodeURIComponent(params.categoryName || '');
-  localStorage.setItem("redirectPath", window.location.pathname);
+  const categoryName = decodeURIComponent(params.categoryName || "");
 
+  useEffect(() => {
+    window.localStorage.setItem("redirectPath", window.location.pathname);
+  }, []);
+  
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -22,8 +25,7 @@ const ProductCategory = ({ params }) => {
           getProductByCategory(params.categoryName),
         ]);
         setCategoryList(categories);
- 
-        
+
         setProductList(products);
         console.log(products);
       } catch (error) {
@@ -35,7 +37,6 @@ const ProductCategory = ({ params }) => {
 
     fetchData();
   }, [params.categoryName]);
-
 
   return (
     <div>

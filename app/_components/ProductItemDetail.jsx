@@ -4,14 +4,17 @@ import { LoaderIcon, ShoppingBasket } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useContext, useEffect, useState } from "react";
-import { addToCart, getCartItemsApi, updateCartItems } from "../_utils/GlobalApi";
+import {
+  addToCart,
+  getCartItemsApi,
+  updateCartItems,
+} from "../_utils/GlobalApi";
 import { toast } from "sonner";
 import { UpdateCartContext } from "../_context/UpdateCartContext";
 
 const ProductItemDetail = ({ product, setOpen }) => {
   const imageUrl = `${process.env.NEXT_PUBLIC_BAKEND_BASE_URL}${product?.attributes?.images?.data[0]?.attributes?.url}`;
-  const { updateCart, setUpdateCart, cartItemsList } =
-    useContext(UpdateCartContext);
+  const { updateCart, setUpdateCart, cartItemsList } =useContext(UpdateCartContext);
 
   const [productTotalPrice, setProductTotalPrice] = useState(
     product?.attributes?.sellingPrice
@@ -25,7 +28,7 @@ const ProductItemDetail = ({ product, setOpen }) => {
   const user = JSON.parse(localStorage.getItem("user"));
   const router = useRouter();
 
-  const AddToCart = async() => {
+  const AddToCart = async () => {
     setLoader(true);
     if (!jwt) {
       router.push("/sign-in");
@@ -39,10 +42,12 @@ const ProductItemDetail = ({ product, setOpen }) => {
     console.log(existingCartItem);
 
     if (existingCartItem) {
-      toast("This product is already in your cart. One more quantity has been added.!!!");
+      toast(
+        "This product is already in your cart. One more quantity has been added.!!!"
+      );
       setLoader(false);
 
-      const id=existingCartItem.id;
+      const id = existingCartItem.id;
       const data = {
         data: {
           quantity: existingCartItem.quantity + 1,
@@ -51,11 +56,10 @@ const ProductItemDetail = ({ product, setOpen }) => {
 
       try {
         setLoader(true);
-        await updateCartItems(id,data,jwt)
-        setOpen(false)
+        await updateCartItems(id, data, jwt);
+        setOpen(false);
       } catch (error) {
         console.log(error);
-        
       }
       return;
     }
@@ -77,7 +81,6 @@ const ProductItemDetail = ({ product, setOpen }) => {
         setUpdateCart(!updateCart);
         setLoader(false);
 
-     
         setOpen(false);
       },
       (err) => {

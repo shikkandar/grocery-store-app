@@ -18,8 +18,9 @@ export default function Home() {
   const [categoryList, setCategoryList] = useState([]);
   const [productList, setProductList] = useState([]);
   const [loading, setLoading] = useState(true);
-  localStorage.setItem("redirectPath", window.location.pathname);
+
   useEffect(() => {
+    window.localStorage.setItem("redirectPath", window.location.pathname);
     const fetchDara = async () => {
       try {
         const [sliders, categories, products] = await Promise.all([
