@@ -189,7 +189,7 @@ function Header() {
                     Subtotal <span>₹ {subtotal}</span>
                   </h2>
                   <Button
-                    onClick={() => router.push(jwt ? "/checkout" : "/sign-in")}>
+                    onClick={() => router.push("/checkout")}>
                     Checkout
                   </Button>
                 </div>
