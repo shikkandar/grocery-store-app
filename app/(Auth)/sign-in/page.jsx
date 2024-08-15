@@ -14,6 +14,7 @@ const Component = () => {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const [loader, setLoader] = useState(false);
+  const [data, setData] = useState()
 
   const router = useRouter();
   const onSignIn = () => {
