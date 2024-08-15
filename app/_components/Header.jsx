@@ -1,4 +1,5 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import { CircleUserIcon, LayoutGrid, Search, ShoppingBag } from "lucide-react";
 import Image from "next/image";
@@ -37,29 +38,33 @@ function Header() {
   const [totalCartItems, setTotalCartItems] = useState(0);
   const [subtotal, setSubtotal] = useState(0);
   const { updateCart } = useContext(UpdateCartContext);
-  const [cartItemsList, setCartItemsList] = useState();
-  const [isLogin, setIsLogin] = useState();
-  const [user, setUser] = useState();
-  const [jwt, setJwt] = useState();
-
+  const [cartItemsList, setCartItemsList] = useState([]);
+  const [user, setUser] = useState(null);
+  const [jwt, setJwt] = useState(null);
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [isLogin, setIsLogin] = useState(false);
 
   useEffect(() => {
-    getCategoryList();
+    // Ensure this runs only on the client
     if (typeof window !== "undefined") {
-      const user = JSON.parse(window.localStorage.getItem("user"));
-      const isLogin = window.localStorage.getItem("jwt") ? true : false;
-      const jwt = window.localStorage.getItem("jwt");
-      setIsLogin(isLogin);
-      setUser(user);
-      setJwt(jwt);
+      const storedUser = JSON.parse(window.localStorage.getItem("user"));
+      const storedJwt = window.localStorage.getItem("jwt");
+      setUser(storedUser);
+      setJwt(storedJwt);
+      setIsLogin(!!storedJwt);
     }
   }, []);
 
   useEffect(() => {
-    getCartItems();
-  }, [updateCart]);
+    getCategoryList();
+  }, []);
+
+  useEffect(() => {
+    if (user && jwt) {
+      getCartItems();
+    }
+  }, [updateCart, user, jwt]);
 
   useEffect(() => {
     let total = 0;
@@ -70,20 +75,23 @@ function Header() {
   }, [cartItemsList]);
 
   const getCategoryList = async () => {
-    await getCategory().then((res) => {
+    try {
+      const res = await getCategory();
       setCategoryList(res.data.data);
-    });
+    } catch (error) {
+      console.error("Failed to fetch categories", error);
+    }
   };
 
   const getCartItems = async () => {
     try {
       setLoading(true);
       const cartItemsList = await getCartItemsApi(user.id, jwt);
-      setLoading(false);
       setCartItemsList(cartItemsList);
       setTotalCartItems(cartItemsList.length);
     } catch (error) {
-      console.log(error);
+      console.error("Failed to fetch cart items", error);
+    } finally {
       setLoading(false);
     }
   };
@@ -96,10 +104,15 @@ function Header() {
   };
 
   const onDeleteItem = (id) => {
-    deleteCartItems(id, jwt).then((res) => {
-      toast.success("Item deleted successfully");
-      getCartItems();
-    });
+    deleteCartItems(id, jwt)
+      .then((res) => {
+        toast.success("Item deleted successfully");
+        getCartItems();
+      })
+      .catch((error) => {
+        toast.error("Failed to delete item");
+        console.error("Failed to delete item", error);
+      });
   };
 
   return (
@@ -107,13 +120,7 @@ function Header() {
       <div className="flex items-center gap-5">
         <Link href={"/"}>
           <div className="flex items-center gap-2">
-            <Image
-              src="/logo.png"
-              alt="logo"
-              width={50}
-              height={50}
-            />
-
+            <Image src="/logo.png" alt="logo" width={50} height={50} />
             <div>
               <h2 className="text-xl font-bold text-red-400">Grocery</h2>
               <h2 className="text-xl font-bold text-primary">Store</h2>
@@ -130,12 +137,8 @@ function Header() {
             <DropdownMenuLabel>Browse Category</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {categoryList.map((category, i) => (
-              <Link
-                key={i}
-                href={`/products_category/${category?.attributes?.name}`}>
-                <DropdownMenuItem
-                  key={i}
-                  className="capitalize flex gap-4 items-center cursor-pointer">
+              <Link key={i} href={`/products_category/${category?.attributes?.name}`}>
+                <DropdownMenuItem className="capitalize flex gap-4 items-center cursor-pointer">
                   <Image
                     src={`${process.env.NEXT_PUBLIC_BAKEND_BASE_URL}${category?.attributes?.icon?.data[0]?.attributes?.url}`}
                     unoptimized={true}
@@ -149,14 +152,9 @@ function Header() {
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
-
         <div className="md:flex gap-3 items-center border rounded-full p-2 px-5 hidden">
           <Search />
-          <input
-            type="text"
-            placeholder="search"
-            className="outline-none"
-          />
+          <input type="text" placeholder="search" className="outline-none" />
         </div>
       </div>
       <div className="flex gap-5 items-center">
@@ -164,7 +162,7 @@ function Header() {
           <SheetTrigger asChild>
             <h2 className="flex gap-2 items-center text-lg cursor-pointer">
               <ShoppingBag />
-              <span className="bg-primary px-2 rounded-full  text-white ">
+              <span className="bg-primary px-2 rounded-full text-white ">
                 {totalCartItems}
               </span>
             </h2>
@@ -188,8 +186,7 @@ function Header() {
                   <h2 className="text-lg font-bold flex justify-between">
                     Subtotal <span>₹ {subtotal}</span>
                   </h2>
-                  <Button
-                    onClick={() => router.push("/checkout")}>
+                  <Button onClick={() => router.push(jwt ? "/checkout" : "/sign-in")}>
                     Checkout
                   </Button>
                 </div>
@@ -197,16 +194,14 @@ function Header() {
             )}
           </SheetContent>
         </Sheet>
-
         {!isLogin ? (
           <Link href={"/sign-in"}>
-            {" "}
             <Button>Log in</Button>
           </Link>
         ) : (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <CircleUserIcon className="cursor-pointer h-8 w-8 bg-green-100 text-primary p-1  rounded-full" />
+              <CircleUserIcon className="cursor-pointer h-8 w-8 bg-green-100 text-primary p-1 rounded-full" />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuLabel>My Account</DropdownMenuLabel>

@@ -15,7 +15,7 @@ import { toast } from "sonner";
 
 const Checkout = () => {
   const { updateCart, setUpdateCart } = useContext(UpdateCartContext);
-  const [cartItemsList, setCartItemsList] = useState([]);
+  const [cartItemsList, setCartItemsList] = useState([]);  
   const [subtotal, setSubtotal] = useState(0);
   const [totalCartItems, setTotalCartItems] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -38,20 +38,23 @@ const Checkout = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      setJwt(localStorage.getItem("jwt"));
-      setUser(JSON.parse(localStorage.getItem("user")));
+    const storedJwt = localStorage.getItem("jwt");
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+
+    if (storedJwt && storedUser) {
+      setJwt(storedJwt);
+      setUser(storedUser);
+    } else {
+      router.push("/sign-in");
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => {
-    if (!jwt) {
-      router.push("/sign-in");
-      return;
+    if (jwt && user) {
+      fetchExchangeRate();
+      getCartItems();
     }
-    fetchExchangeRate();
-    getCartItems();
-  }, [jwt, router]);
+  }, [jwt, user, router]);
 
   useEffect(() => {
     if (cartItemsList.length > 0 && dollarRate) {
@@ -84,12 +87,10 @@ const Checkout = () => {
 
   const getCartItems = async () => {
     try {
-      if (user && jwt) {
-        setLoading(true);
-        const items = await getCartItemsApi(user.id, jwt);
-        setCartItemsList(items);
-        setTotalCartItems(items.length);
-      }
+      setLoading(true);
+      const items = await getCartItemsApi(user.id, jwt);
+      setCartItemsList(items);
+      setTotalCartItems(items.length);
     } catch (error) {
       console.error("Error fetching cart items:", error);
     } finally {
@@ -102,7 +103,7 @@ const Checkout = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const onApprove = async (data) => {
+  const onApprove = (data) => {
     setPayBtnDisabled(true);
     setLoading(true);
     const paymentId = data.paymentID;
@@ -126,25 +127,21 @@ const Checkout = () => {
       },
     };
 
-    try {
-      await createOrder(payload, jwt);
-      toast("Order Placed Successfully!!!");
+    createOrder(payload, jwt)
+      .then((res) => {
+        toast("Order Placed Successfully!!!");
 
-      await Promise.all(
-        cartItemsList.map((item) =>
+        cartItemsList.forEach((item) => {
           deleteCartItems(item.id, jwt).then(() => {
             setUpdateCart(!updateCart);
-          })
-        )
-      );
-
-      router.replace("/order-confirmation");
-    } catch (error) {
-      console.error("Error creating order:", error);
-      setPayBtnDisabled(false);
-    } finally {
-      setLoading(false);
-    }
+            router.replace("/order-confirmation");
+          });
+        });
+      })
+      .catch((err) => {
+        setPayBtnDisabled(false);
+        setLoading(false);
+      });
   };
 
   return (
@@ -239,7 +236,7 @@ const Checkout = () => {
                         {
                           amount: {
                             value: totalUsdRef.current,
-                            currency_code: "USD",
+                            currency_code: "USD", // Ensure this is set to USD
                           },
                         },
                       ],

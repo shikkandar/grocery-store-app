@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -10,23 +10,19 @@ import { useRouter } from "next/navigation";
 import { LoaderIcon } from "lucide-react";
 import { UnAuthUser } from "@/app/_ProtectRoute/AuthUser";
 
-
 const Component = () => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState();
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
   const [loader, setLoader] = useState(false);
 
   const router = useRouter();
-
   const onCreateAccount = () => {
     setLoader(true);
     registerUser(username, email, password).then(
       (res) => {
-        if (typeof window !== "undefined") {
-          localStorage.setItem("user", JSON.stringify(res.data.user));
-          localStorage.setItem("jwt", res.data.jwt);
-        }
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+        localStorage.setItem("jwt", res.data.jwt);
         toast.success("Account Created Successfully");
         router.push("/");
         setLoader(false);
@@ -37,12 +33,16 @@ const Component = () => {
       }
     );
   };
-
   return (
-    <div className="flex items-baseline justify-center my-20">
+    <div className="flex items-baseline justify-center my-20 ">
       <div className="flex flex-col items-center justify-center p-10 bg-slate-100 border-gray-200">
         <div className="flex gap-2 items-center">
-          <Image src={"/logo.png"} alt="logo" width={50} height={50} />
+          <Image
+            src={"/logo.png"}
+            alt="logo"
+            width={50}
+            height={50}
+          />
           <div>
             <h2 className="text-2xl font-bold text-red-500">Grocery</h2>
             <h2 className="text-2xl font-bold text-green-600">Store</h2>
@@ -50,7 +50,7 @@ const Component = () => {
         </div>
         <h2 className="font-bold text-3xl">Create Account</h2>
         <h2 className="text-gray-500">
-          Enter your Email and password to create an account
+          Enter your Email and password to create an acoount
         </h2>
         <div className="w-full flex flex-col gap-5 mt-7">
           <Input
@@ -67,9 +67,8 @@ const Component = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
           <Button
-            disabled={!(username && email && password)}
-            onClick={onCreateAccount}
-          >
+            disabled={!(username || email || password)}
+            onClick={onCreateAccount}>
             {loader ? (
               <LoaderIcon className="animate-spin" />
             ) : (
@@ -78,7 +77,9 @@ const Component = () => {
           </Button>
           <p>
             Already have an account{" "}
-            <Link className="text-blue-500" href={"/sign-in"}>
+            <Link
+              className="text-blue-500"
+              href={"/sign-in"}>
               sign in
             </Link>
           </p>
@@ -87,13 +88,12 @@ const Component = () => {
     </div>
   );
 };
-
 const CreateAccount = () => {
-  return (
+  return(
     <UnAuthUser>
       <Component />
     </UnAuthUser>
-  );
+  )
 };
 
 export default CreateAccount;
