@@ -10,30 +10,39 @@ export const AuthUser = ({ children }) => {
   useEffect(() => {
     const jwt = localStorage.getItem("jwt");
     if (!jwt) {
-      localStorage.setItem("redirectPath", window.location.pathname);
-      router.replace("/sign-in");
+      if (typeof window !== "undefined") {
+        localStorage.setItem("redirectPath", window.location.pathname);
+        router.replace("/sign-in");
+      }
     } else {
       setIsAuth(true);
     }
   }, [router]);
 
   if (!isAuth) {
-    return null; // Render nothing (or a loader if desired) while checking authentication
+    return null; 
   }
 
-  return <>{children}</>; // Correctly return the children
+  return <>{children}</>; 
 };
 
 export const UnAuthUser = ({ children }) => {
+  const [jwt, setJwt] = useState();
+  const [redirectPath, setRedirectPath] = useState();
   const router = useRouter();
-  const jwt = localStorage.getItem("jwt");
-
-  const redirectPath = localStorage.getItem("redirectPath");
+  if (typeof window !== "undefined") {
+    const jwt = localStorage.getItem("jwt");
+    setJwt(jwt);
+    const redirectPath = localStorage.getItem("redirectPath");
+    setRedirectPath(redirectPath);
+  }
 
   if (jwt) {
     if (redirectPath) {
-      router.replace(redirectPath || "/"); // Redirect to the original path
-      localStorage.removeItem("redirectPath"); // Clear the stored path
+      router.replace(redirectPath || "/");
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("redirectPath");
+      }
     }
   }
   if (!jwt) {

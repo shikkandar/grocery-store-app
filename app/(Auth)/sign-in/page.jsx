@@ -1,6 +1,3 @@
-
-
-// pages/sign-in.js
 "use client";
 import { UnAuthUser } from "@/app/_ProtectRoute/AuthUser";
 import { signIn } from "@/app/_utils/GlobalApi";
@@ -10,15 +7,16 @@ import { LoaderIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { toast } from "sonner";
 
 const Component = () => {
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loader, setLoader] = useState(false);
 
   const router = useRouter();
+
   const onSignIn = () => {
     setLoader(true);
     signIn(email, password).then(
@@ -37,17 +35,12 @@ const Component = () => {
       }
     );
   };
+
   return (
-    <div className="flex items-baseline justify-center my-20 ">
-       <div className="flex items-baseline justify-center my-20 ">
+    <div className="flex items-baseline justify-center my-20">
       <div className="flex flex-col items-center justify-center p-10 bg-slate-100 border-gray-200">
         <div className="flex gap-2 items-center">
-          <Image
-            src={"/logo.png"}
-            alt="logo"
-            width={50}
-            height={50}
-          />
+          <Image src={"/logo.png"} alt="logo" width={50} height={50} />
           <div>
             <h2 className="text-2xl font-bold text-red-500">Grocery</h2>
             <h2 className="text-2xl font-bold text-green-600">Store</h2>
@@ -55,7 +48,7 @@ const Component = () => {
         </div>
         <h2 className="font-bold text-3xl">Sign in to account</h2>
         <h2 className="text-gray-500">
-          Enter your Email and password to sign in account
+          Enter your Email and password to sign in to your account
         </h2>
         <div className="w-full flex flex-col gap-5 mt-7">
           <Input
@@ -68,21 +61,19 @@ const Component = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
           <Button
-            disabled={!(email || password)}
-            onClick={onSignIn}>
+            disabled={!(email && password)}
+            onClick={onSignIn}
+          >
             {loader ? <LoaderIcon className="animate-spin" /> : "Sign In"}
           </Button>
           <p>
-            Don't have an account ?
-            <Link
-              className="text-blue-500"
-              href={"/create-account"}>
+            Don't have an account?{" "}
+            <Link className="text-blue-500" href={"/create-account"}>
               Register Now
             </Link>
           </p>
         </div>
       </div>
-    </div>
     </div>
   );
 };
