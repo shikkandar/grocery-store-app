@@ -27,25 +27,23 @@ export const AuthUser = ({ children }) => {
 };
 
 export const UnAuthUser = ({ children }) => {
-  const [jwt, setJwt] = useState();
-  const [redirectPath, setRedirectPath] = useState();
+  const [jwt, setJwt] = useState(null);
   const router = useRouter();
-  if (typeof window !== "undefined") {
+
+  useEffect(() => {
     const jwt = localStorage.getItem("jwt");
     setJwt(jwt);
-    const redirectPath = localStorage.getItem("redirectPath");
-    setRedirectPath(redirectPath);
-  }
+    
+    if (jwt) {
+      const redirectPath = localStorage.getItem("redirectPath");
+      router.replace(redirectPath || "/");
+      localStorage.removeItem("redirectPath");
+    }
+  }, [router]);
 
   if (jwt) {
-    if (redirectPath) {
-      router.replace(redirectPath || "/");
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("redirectPath");
-      }
-    }
+    return null; // If the user is authenticated, render nothing here.
   }
-  if (!jwt) {
-    return children;
-  }
+
+  return children; // If not authenticated, render the children (login form).
 };
