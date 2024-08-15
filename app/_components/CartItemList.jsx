@@ -37,6 +37,7 @@ console.log(cartItemsList);
                   width={70}
                   height={70}
                   alt={cart.name}
+                  unoptimized={true}
                   className="border p-2 object-contain"
                 />
                 <div>
