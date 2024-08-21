@@ -5,7 +5,7 @@ const nextConfig = {
         remotePatterns: [
             {
                 protocol: 'http',
-                hostname: '127.0.0.1',
+                hostname: 'https://grocery-store-app-bakend.onrender.com',
                 port: '1337',
                 pathname: '/uploads/**',
             },
